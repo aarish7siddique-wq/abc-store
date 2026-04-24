@@ -6,6 +6,8 @@
 <title>Farax Automation | Premium Ecommerce</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick-theme.css"/>
 <style>
 :root{
   --orange:#ff7a00;
@@ -135,6 +137,26 @@ button,input{font-family:inherit}
 .banner-large:hover img,.banner-small:hover img{transform:scale(1.06)}
 .banner-caption{position:absolute;inset:auto 0 0 0;padding:14px;color:#fff;background:linear-gradient(180deg, transparent, rgba(0,0,0,.66));font-weight:700}
 .banner-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+
+.top-slider-wrapper{
+  margin:30px 0 10px;
+}
+
+.top-slider .card{
+  margin:0 10px;
+}
+
+.top-slider .slick-slide{
+  display:flex !important;
+  justify-content:center;
+}
+
+.view-all-btn{
+  color:var(--orange-dark);
+  font-weight:700;
+  margin-left:auto;
+}
 
 .section-header{margin:34px 0 16px;display:flex;align-items:flex-end;justify-content:space-between;gap:14px;flex-wrap:wrap}
 .section-header h3{margin:0;font-size:1.55rem;line-height:1.2}
@@ -345,9 +367,14 @@ button,input{font-family:inherit}
       </div>
     </section>
 
+    <section class="top-slider-wrapper">
+      <div class="top-slider" id="topSlider"></div>
+    </section>
+
     <div class="section-header reveal" id="shop">
       <h3>Featured Products</h3>
       <p>Carefully selected best sellers</p>
+      <a href="#" class="view-all-btn">View All →</a>
       <span class="status-pill" id="filterStatus"><i class="fa-solid fa-filter"></i><span id="statusText"></span></span>
     </div>
     <div class="product-slider reveal" id="productSlider">
@@ -387,6 +414,9 @@ button,input{font-family:inherit}
 </div>
 
 <div class="toast" id="toast">Added to cart</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script>
 
 <script>
 const STORE = {
@@ -628,6 +658,47 @@ function closeProductModal(){
   if(!DOM.cart.classList.contains('open')) document.body.classList.remove('lock-scroll');
 }
 
+
+function initTopSlider(){
+  const container = document.getElementById("topSlider");
+  if(!container || typeof window.jQuery === 'undefined' || typeof window.jQuery.fn.slick === 'undefined') return;
+
+  const html = STORE.products.map(p => `
+    <div class="card">
+      <div class="card-media">
+        <img loading="lazy" src="${p.img}" alt="${p.name}">
+      </div>
+      <div class="card-body">
+        <h4>${p.name}</h4>
+        <div class="price">Rs. ${p.price.toLocaleString()}</div>
+        <button class="btn" type="button" onclick="addToCart(${p.id})">Add to Cart</button>
+      </div>
+    </div>
+  `).join("");
+
+  container.innerHTML = html;
+
+  if(window.jQuery(container).hasClass('slick-initialized')){
+    window.jQuery(container).slick('unslick');
+  }
+
+  window.jQuery('#topSlider').slick({
+    slidesToShow: 5,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 0,
+    speed: 5000,
+    cssEase: 'linear',
+    infinite: true,
+    arrows: false,
+    pauseOnHover: false,
+    responsive: [
+      { breakpoint: 1024, settings: { slidesToShow: 3 }},
+      { breakpoint: 600, settings: { slidesToShow: 2 }}
+    ]
+  });
+}
+
 function setupEvents(){
   DOM.searchInput.addEventListener('input', (event) => {
     APP.query = event.target.value;
@@ -738,6 +809,7 @@ function autoScrollProducts(){
 function init(){
   renderCategories();
   renderProducts();
+  initTopSlider();
   updateCart();
   setupEvents();
   createDots();
