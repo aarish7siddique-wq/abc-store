@@ -369,25 +369,21 @@ button,input{font-family:inherit}
 .section-header h3{margin:0;font-size:1.55rem;line-height:1.2}
 .section-header p{margin:0;color:var(--muted);font-size:1rem}
 .product-slider{
-  overflow:hidden;
+  overflow-x:auto;
+  overflow-y:hidden;
+  width:100%;
+  scroll-behavior:smooth;
 }
 
 .product-slider .products{
   display:flex;
   gap:18px;
-
-  animation:scrollProducts 40s linear infinite;
+  width:max-content;
 }
 
 .card{
   min-width:240px;
   flex-shrink:0;
-}
-
-/* smooth infinite scroll */
-@keyframes scrollProducts{
-  0%{transform:translateX(0)}
-  100%{transform:translateX(-50%)}
 }
 .card{
   background:#fff;
@@ -807,7 +803,7 @@ function renderProducts(){
     `).join("");
 
     // 👇 VERY IMPORTANT (infinite loop fix)
-    container.innerHTML = html;
+    container.innerHTML = html + html;
 
     requestAnimationFrame(() => {
       container.querySelectorAll('.card').forEach((card, idx) => {
@@ -985,6 +981,23 @@ showSlide(0);
 startAutoPlay();
 renderProducts();
 updateCart();
+
+const slider = document.querySelector('.product-slider');
+
+let scrollSpeed = 0.3;
+
+function autoScroll(){
+  slider.scrollLeft += scrollSpeed;
+
+  if(slider.scrollLeft >= slider.scrollWidth / 2){
+    slider.scrollLeft = 0;
+  }
+
+  requestAnimationFrame(autoScroll);
+}
+
+autoScroll();
+
 </script>
 </body>
 </html>
